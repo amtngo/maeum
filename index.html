@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#f4f1eb">
+  <title>人間関係の本音</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f1eb;
+      --card: rgba(255, 255, 255, 0.90);
+      --text: #26231f;
+      --muted: #817a71;
+      --line: #ded8cf;
+      --accent: #70675e;
+      --selected: #ebe5dc;
+      --shadow: 0 20px 60px rgba(52, 46, 39, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: var(--bg);
+    }
+
+    body {
+      min-height: 100svh;
+      margin: 0;
+      padding: max(24px, env(safe-area-inset-top)) 18px
+               max(24px, env(safe-area-inset-bottom));
+      display: grid;
+      place-items: center;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 10%, rgba(255,255,255,.86), transparent 34%),
+        radial-gradient(circle at 85% 90%, rgba(223,216,205,.75), transparent 38%),
+        var(--bg);
+      font-family:
+        -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN",
+        "Hiragino Sans", "Yu Gothic", "YuGothic", "Noto Sans JP",
+        "Meiryo", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    main {
+      width: min(100%, 540px);
+    }
+
+    .card {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(28px, 6vw, 44px) clamp(22px, 6vw, 40px);
+      border: 1px solid rgba(255,255,255,.82);
+      border-radius: 28px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      margin: 0 0 34px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-align: center;
+    }
+
+
+    h1 {
+      margin: 0;
+      font-size: clamp(24px, 6.2vw, 34px);
+      font-weight: 700;
+      line-height: 1.55;
+      letter-spacing: .01em;
+      text-align: center;
+      white-space: pre-line;
+      text-wrap: balance;
+    }
+
+    .guide {
+      margin: 24px 0 14px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .options {
+      display: grid;
+      gap: 11px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .option {
+      width: 100%;
+      min-height: 56px;
+      padding: 15px 16px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      color: var(--text);
+      background: rgba(255,255,255,.72);
+      font: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.55;
+      text-align: left;
+      cursor: pointer;
+      transition:
+        transform .16s ease,
+        border-color .16s ease,
+        background-color .16s ease,
+        box-shadow .16s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .option:hover {
+      transform: translateY(-1px);
+      border-color: #c9c0b5;
+      box-shadow: 0 7px 20px rgba(52,46,39,.07);
+    }
+
+    .option:focus-visible {
+      outline: 3px solid rgba(112, 103, 94, .20);
+      outline-offset: 2px;
+    }
+
+    .option[aria-pressed="true"] {
+      border-color: #b9aea1;
+      background: var(--selected);
+      box-shadow: inset 0 0 0 1px rgba(112,103,94,.08);
+    }
+
+    .progress {
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-align: center;
+    }
+
+
+    .result-screen {
+      min-height: 420px;
+      display: grid;
+      place-content: center;
+      gap: 22px;
+      text-align: center;
+    }
+
+    .selected-option {
+      margin: 0;
+      font-size: clamp(18px, 4.8vw, 24px);
+      font-weight: 650;
+      line-height: 1.7;
+      text-wrap: balance;
+    }
+
+
+    .result-label {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+      font-weight: 650;
+      line-height: 1.5;
+    }
+
+    .selected-percent {
+      margin: 0;
+      color: var(--accent);
+      font-size: clamp(64px, 19vw, 96px);
+      font-weight: 780;
+      line-height: 1;
+      letter-spacing: -0.05em;
+      font-variant-numeric: tabular-nums;
+    }
+
+
+    .question-url-button {
+      width: min(100%, 310px);
+      margin: 4px auto 0;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 18px;
+      background: rgba(255,255,255,.82);
+      color: var(--text);
+      font: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.4;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(52,46,39,.07);
+      transition:
+        transform .15s ease,
+        background .15s ease,
+        border-color .15s ease;
+    }
+
+    .question-url-button:hover {
+      background: #fff;
+      border-color: #c9c0b5;
+    }
+
+    .question-url-button:active {
+      transform: scale(.98);
+    }
+
+    .limit {
+      line-height: 1.35;
+      min-height: 420px;
+      display: grid;
+      place-content: center;
+      text-align: center;
+    }
+
+    .limit p {
+      margin: 0;
+    }
+
+
+    .limit-message {
+      margin: 0;
+      line-height: 1.35;
+    }
+
+    .limit .symbol {
+      margin-bottom: 22px;
+      color: var(--accent);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 42px;
+      line-height: 1;
+    }
+
+    .limit h1 {
+      font-size: clamp(22px, 5.8vw, 30px);
+      line-height: 1.75;
+    }
+
+    .limit-note {
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 380px) {
+      body {
+        padding-inline: 12px;
+      }
+
+      .card {
+        border-radius: 22px;
+      }
+
+      .option {
+        font-size: 14px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .option {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main id="app" aria-live="polite"></main>
+
+  <script>
+    "use strict";
+
+    const QUESTIONS = [
+  {
+    "question": "別れたあと、\n何度も思い返したのは？",
+    "options": [
+      "最後の一言が頭に残っていた",
+      "別れ際の表情が気になった",
+      "言えなかったことを思い出した",
+      "あの沈黙だけ忘れられなかった"
+    ]
+  },
+  {
+    "question": "久しぶりに会って\n最初に気づいたのは？",
+    "options": [
+      "話し方が少し変わっていた",
+      "前より目が合わなくなっていた",
+      "自然な距離が遠く感じた",
+      "笑う間が少し長くなっていた"
+    ]
+  },
+  {
+    "question": "家に帰ってから\n気になり始めたのは？",
+    "options": [
+      "何か言い忘れた気がした",
+      "相手の本当の気持ちを考えた",
+      "あの場面だけ何度も浮かんだ",
+      "あの時間が短すぎたと感じた"
+    ]
+  },
+  {
+    "question": "話している途中で\n気になったのは？",
+    "options": [
+      "言葉を選ぶ時間が増えた",
+      "途中で話題を変えた",
+      "笑ってごまかした",
+      "最後まで言い切らなかった"
+    ]
+  },
+  {
+    "question": "もしかしてと思ったのは\nどんな出来事？",
+    "options": [
+      "何気なく予定を聞かれた",
+      "前の話を覚えていてくれた",
+      "帰る時間を気にしなかった",
+      "また会おうと笑ってくれた"
+    ]
+  },
+  {
+    "question": "本当の気持ちを\n感じた瞬間は？",
+    "options": [
+      "思わず本音が出た",
+      "冗談のあと急に黙った",
+      "小さくため息をついた",
+      "安心したように笑った"
+    ]
+  },
+  {
+    "question": "メッセージを見て\n最初に気づいたのは？",
+    "options": [
+      "返事までの時間が変わっていた",
+      "言葉遣いが少し違っていた",
+      "以前より質問が増えていた",
+      "最後の一文だけ気になった"
+    ]
+  },
+  {
+    "question": "一番気まずかったのは\nどんな瞬間？",
+    "options": [
+      "急に会話が止まった",
+      "同じ話を繰り返した",
+      "返事が短くなった",
+      "沈黙を埋められなかった"
+    ]
+  },
+  {
+    "question": "いつも通りだったのに\n違和感を覚えたのは？",
+    "options": [
+      "話す順番が変わっていた",
+      "目を合わせる回数が減っていた",
+      "会話の間が少し長かった",
+      "帰るタイミングが早かった"
+    ]
+  },
+  {
+    "question": "時間が経っても\n浮かぶ場面は？",
+    "options": [
+      "最後に交わした言葉だった",
+      "別れ際の表情だった",
+      "何も話さなかった時間だった",
+      "歩き去る後ろ姿だった"
+    ]
+  },
+  {
+    "question": "その日の出来事で\n一番残ったのは？",
+    "options": [
+      "名前を呼ばれた声だった",
+      "ふと目が合った瞬間だった",
+      "笑い合った時間だった",
+      "静かな空気が続いたことだった"
+    ]
+  },
+  {
+    "question": "相手の気持ちを\n考えてしまったのは？",
+    "options": [
+      "帰る時間を気にしていなかった",
+      "前より自分の話を聞いてくれた",
+      "小さな変化に気づいてくれた",
+      "別れ際にまた話しかけてくれた"
+    ]
+  },
+  {
+    "question": "相手が\n迷っていると思ったのは？",
+    "options": [
+      "返事をすぐにしなかった",
+      "何度も言い直していた",
+      "視線が落ち着かなかった",
+      "最後まで決めきれなかった"
+    ]
+  },
+  {
+    "question": "久しぶりに会って\n最初に感じた変化は？",
+    "options": [
+      "表情が少し固かった",
+      "話す速さが変わっていた",
+      "立つ距離が遠く感じた",
+      "目を合わせる時間が減った"
+    ]
+  },
+  {
+    "question": "一番心に残ったのは\nどんな瞬間？",
+    "options": [
+      "目が合ったまま笑った",
+      "別れ際に振り返った",
+      "何も言わず見送ってくれた",
+      "名前を呼ぶ声が優しかった"
+    ]
+  },
+  {
+    "question": "家に帰ってから\n思い出したのは？",
+    "options": [
+      "聞けばよかったことがあった",
+      "伝えたかったことが残っていた",
+      "あの表情が忘れられなかった",
+      "もう少し一緒にいたかった"
+    ]
+  },
+  {
+    "question": "何となく\n気になったのは？",
+    "options": [
+      "返事の間が長かった",
+      "笑顔が少し減っていた",
+      "自分から話さなくなった",
+      "予定を決めなくなった"
+    ]
+  },
+  {
+    "question": "また会いたいと\n思ったきっかけは？",
+    "options": [
+      "自然に笑い合えた",
+      "話が途切れなかった",
+      "名前を呼ばれた",
+      "別れ際に振り返ってくれた"
+    ]
+  },
+  {
+    "question": "相手を見ていて\n驚いたのは？",
+    "options": [
+      "普段よりよく話してくれた",
+      "弱い一面を見せてくれた",
+      "急に真面目な表情になった",
+      "素直に謝ってくれた"
+    ]
+  },
+  {
+    "question": "前とは違うと\n感じ始めたのは？",
+    "options": [
+      "約束を決めなくなった",
+      "連絡が用事だけになった",
+      "話題が続かなくなった",
+      "一緒に笑うことが減った"
+    ]
+  },
+  {
+    "question": "その日だけ\n忘れられなかったのは？",
+    "options": [
+      "帰る前の一言だった",
+      "目を合わせた時間だった",
+      "何気ない沈黙だった",
+      "別れたあとの空気だった"
+    ]
+  },
+  {
+    "question": "会話のあとで\n思い返したのは？",
+    "options": [
+      "あの返事の早さだった",
+      "急に変わった話題だった",
+      "最後の言い回しだった",
+      "少し長かった間だった"
+    ]
+  },
+  {
+    "question": "会話の途中で\n気になった瞬間は？",
+    "options": [
+      "急に話が止まった",
+      "返事を少し考えていた",
+      "何か言いかけて笑った",
+      "目をそらして黙ってしまった"
+    ]
+  },
+  {
+    "question": "一緒にいて\n落ち着いたのは？",
+    "options": [
+      "無理に話さなくてよかった",
+      "沈黙が気にならなかった",
+      "自然に笑うことができた",
+      "時間を忘れて話していた"
+    ]
+  },
+  {
+    "question": "帰る前に\n気になったのは？",
+    "options": [
+      "時計を見る回数が増えた",
+      "荷物を早くまとめ始めた",
+      "話を終わらせようとしていた",
+      "少し急いで帰っていった"
+    ]
+  },
+  {
+    "question": "もっと話したいと\n思った理由は？",
+    "options": [
+      "話が途中で終わった",
+      "聞きたいことが残っていた",
+      "相手が楽しそうだった",
+      "まだ時間が足りなかった"
+    ]
+  },
+  {
+    "question": "帰り道で\n思い出したのは？",
+    "options": [
+      "聞けなかったことがあった",
+      "本音を隠してしまった",
+      "冗談で終わらせてしまった",
+      "素直に伝えられなかった"
+    ]
+  },
+  {
+    "question": "その日だけ\n印象に残ったのは？",
+    "options": [
+      "話し始める前の表情だった",
+      "名前を呼ぶ声だった",
+      "別れ際の手の動きだった",
+      "歩き出すタイミングだった"
+    ]
+  },
+  {
+    "question": "今思えば\n始まりだったのは？",
+    "options": [
+      "連絡が増え始めた",
+      "目が合う回数が増えた",
+      "自然に名前で呼んだ",
+      "帰る時間が遅くなった"
+    ]
+  },
+  {
+    "question": "今でも\n忘れられないのは？",
+    "options": [
+      "最後に交わした約束",
+      "何気ない一言",
+      "静かに流れた時間",
+      "笑顔で手を振った姿"
+    ]
+  }
+];
+
+    const STORAGE_KEY = "honne_random_questions_v2";
+    const LIMIT = 3;
+    const WINDOW_MS = 10 * 60 * 60 * 1000;
+
+    function readState() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
+
+        if (
+          !parsed ||
+          typeof parsed.startedAt !== "number" ||
+          !Array.isArray(parsed.seenIndexes)
+        ) {
+          return null;
+        }
+
+        return {
+          startedAt: parsed.startedAt,
+          seenIndexes: parsed.seenIndexes.filter(
+            (index) => Number.isInteger(index) && index >= 0 && index < QUESTIONS.length
+          ),
+          previousCycleIndexes: Array.isArray(parsed.previousCycleIndexes)
+            ? parsed.previousCycleIndexes.filter(
+                (index) => Number.isInteger(index) && index >= 0 && index < QUESTIONS.length
+              )
+            : []
+        };
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function writeState(state) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (error) {
+        // localStorage가 차단된 환경에서는 현재 탭에서만 정상 표시됩니다.
+      }
+    }
+
+    function createNewState(now, previousCycleIndexes = []) {
+      return {
+        startedAt: now,
+        seenIndexes: [],
+        previousCycleIndexes
+      };
+    }
+
+    function getCurrentState(now) {
+      const saved = readState();
+
+      if (!saved) {
+        return createNewState(now);
+      }
+
+      const hasExpired =
+        now < saved.startedAt ||
+        now - saved.startedAt >= WINDOW_MS;
+
+      if (hasExpired) {
+        return createNewState(now, saved.seenIndexes.slice(-LIMIT));
+      }
+
+      return saved;
+    }
+
+    function pickRandomQuestionIndex(state) {
+      const seen = new Set(state.seenIndexes);
+      const previous = new Set(state.previousCycleIndexes);
+
+      let candidates = QUESTIONS
+        .map((question, index) => index)
+        .filter((index) => !seen.has(index) && !previous.has(index));
+
+      if (candidates.length === 0) {
+        candidates = QUESTIONS
+          .map((question, index) => index)
+          .filter((index) => !seen.has(index));
+      }
+
+      const randomPosition = Math.floor(Math.random() * candidates.length);
+      return candidates[randomPosition];
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+
+    function makePercent() {
+      const percentages = [
+        31, 34, 37, 41, 43, 46,
+        52, 57, 61, 63, 67,
+        72, 74, 76, 79, 83, 86
+      ];
+
+      return percentages[Math.floor(Math.random() * percentages.length)];
+    }
+
+    function showNextQuestion() {
+      history.replaceState({}, "", window.location.pathname);
+
+      const now = Date.now();
+      const state = getCurrentState(now);
+
+      if (state.seenIndexes.length >= LIMIT) {
+        writeState(state);
+        renderLimitMessage();
+        return;
+      }
+
+      const questionIndex = pickRandomQuestionIndex(state);
+      const question = QUESTIONS[questionIndex];
+
+      if (!Number.isInteger(questionIndex) || !question) {
+        renderLimitMessage();
+        return;
+      }
+
+      state.seenIndexes.push(questionIndex);
+      writeState(state);
+      renderQuestion(question, state.seenIndexes.length, questionIndex);
+    }
+
+    function renderSelectedResult(percent) {
+      const app = document.getElementById("app");
+
+      app.innerHTML = `
+        <section class="card result-screen" aria-label="選択結果">
+          <p class="result-label">あなたの選択は</p>
+          <p class="selected-percent">${percent}%</p>
+          <button
+            class="question-url-button"
+            id="nextQuestionButton"
+            type="button"
+          >
+            もう一つ、質問を見てみる
+          </button>
+        </section>
+      `;
+
+      document
+        .getElementById("nextQuestionButton")
+        .addEventListener("click", showNextQuestion, { once: true });
+    }
+
+    function renderQuestion(question, viewNumber, questionIndex) {
+      const app = document.getElementById("app");
+      const optionButtons = question.options
+        .map(
+          (option, index) => `
+            <li>
+              <button
+                class="option"
+                type="button"
+                data-option-index="${index}"
+                aria-pressed="false"
+              >
+                ${escapeHtml(option)}
+              </button>
+            </li>
+          `
+        )
+        .join("");
+
+      app.innerHTML = `
+        <section class="card" aria-labelledby="question-title">
+          <p class="brand">人間関係の本音</p>
+          <h1 id="question-title">${escapeHtml(question.question)}</h1>
+          <p class="guide">いちばん近いものを選んでください</p>
+          <ul class="options">${optionButtons}</ul>
+          <p class="progress">QUESTION ${viewNumber} / ${LIMIT}</p>
+        </section>
+      `;
+
+      app.querySelectorAll(".option").forEach((button) => {
+        button.addEventListener("click", () => {
+          const selectedIndex = Number(button.dataset.optionIndex);
+
+          if (!Number.isInteger(selectedIndex)) {
+            return;
+          }
+
+          app.querySelectorAll(".option").forEach((item) => {
+            item.disabled = true;
+          });
+
+          const percent = makePercent();
+          renderSelectedResult(percent);
+        }, { once: true });
+      });
+    }
+
+    function renderLimitMessage() {
+      const app = document.getElementById("app");
+
+      app.innerHTML = `
+        <section class="card limit" aria-labelledby="limit-title">
+          <div class="symbol" aria-hidden="true">—</div>
+          <h1 id="limit-title"><p class="limit-message">今回出会える質問は<br>
+ここまでです。<br>
+10時間後に<br>
+また別の質問が現れます。</p></h1>
+          <p class="limit-note">このページを閉じても、時間はそのまま引き継がれます。</p>
+        </section>
+      `;
+    }
+
+    function getRequestedQuestionIndex() {
+      const rawValue = new URLSearchParams(window.location.search).get("q");
+
+      if (rawValue === null) {
+        return null;
+      }
+
+      const questionNumber = Number(rawValue);
+      const questionIndex = questionNumber - 1;
+
+      return Number.isInteger(questionIndex) &&
+        questionIndex >= 0 &&
+        questionIndex < QUESTIONS.length
+          ? questionIndex
+          : null;
+    }
+
+    function init() {
+      const now = Date.now();
+      const state = getCurrentState(now);
+
+      if (state.seenIndexes.length >= LIMIT) {
+        writeState(state);
+        renderLimitMessage();
+        return;
+      }
+
+      const requestedQuestionIndex = getRequestedQuestionIndex();
+      const questionIndex = requestedQuestionIndex ?? pickRandomQuestionIndex(state);
+      const question = QUESTIONS[questionIndex];
+
+      if (!Number.isInteger(questionIndex) || !question) {
+        renderLimitMessage();
+        return;
+      }
+
+      state.seenIndexes.push(questionIndex);
+      writeState(state);
+      renderQuestion(question, state.seenIndexes.length, questionIndex);
+    }
+
+    window.addEventListener("pageshow", init);
+  </script>
+</body>
+</html>
